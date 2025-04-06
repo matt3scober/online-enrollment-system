@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  # PostgreSQL databases for each service
+  auth-db:
+    image: postgres:14-alpine
+    container_name: auth-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password
+    ports:
+      - "5431:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+      - ./postgres/init/auth-db:/docker-entrypoint-initdb.d
+    networks:
+      - enrollment-network
+
+  course-db:
+    image: postgres:14-alpine
+    container_name: course-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: course_db
+      POSTGRES_USER: course_user
+      POSTGRES_PASSWORD: course_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - course-db-data:/var/lib/postgresql/data
+      - ./postgres/init/course-db:/docker-entrypoint-initdb.d
+    networks:
+      - enrollment-network
+
+  enrollment-db:
+    image: postgres:14-alpine
+    container_name: enrollment-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: enrollment_db
+      POSTGRES_USER: enrollment_user
+      POSTGRES_PASSWORD: enrollment_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - enrollment-db-data:/var/lib/postgresql/data
+      - ./postgres/init/enrollment-db:/docker-entrypoint-initdb.d
+    networks:
+      - enrollment-network
+
+  grading-db:
+    image: postgres:14-alpine
+    container_name: grading-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: grading_db
+      POSTGRES_USER: grading_user
+      POSTGRES_PASSWORD: grading_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - grading-db-data:/var/lib/postgresql/data
+      - ./postgres/init/grading-db:/docker-entrypoint-initdb.d
+    networks:
+      - enrollment-network
+
+  # Redis for caching and distributed locks
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis_password
+    volumes:
+      - redis-data:/data
+    networks:
+      - enrollment-network
+
+  # RabbitMQ for messaging between services
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"  # AMQP port
+      - "15672:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit_user
+      RABBITMQ_DEFAULT_PASS: rabbit_password
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - enrollment-network
+
+volumes:
+  auth-db-data:
+  course-db-data:
+  enrollment-db-data:
+  grading-db-data:
+  redis-data:
+  rabbitmq-data:
+
+networks:
+  enrollment-network:
+    driver: bridge

@@ -1,0 +1,77 @@
+server:
+    port: 8080
+
+spring:
+    application:
+        name: api-gateway
+    
+    cloud:
+        gateway:
+            routes:
+                - id: auth-service
+                  uri: http://localhost:8081
+                  predicates:
+                    - Path=/auth/**
+                  filters:
+                    - RewritePath=/auth/(?<path>.*), /$\{path}
+
+                - id: course-service
+                  uri: http://localhost:8082
+                  predicates:
+                    - Path=/courses/**
+                  filters:
+                    - RewritePath=/courses/(?<path>.*), /$\{path}
+                    
+                - id: enrollment-service
+                  uri: http://localhost:8083
+                  predicates:
+                    - Path=/enrollments/**
+                  filters:
+                    - RewritePath=/enrollments/(?<path>.*), /$\{path}
+                    
+                - id: grading-service
+                  uri: http://localhost:8084
+                  predicates:
+                    - Path=/grades/**
+                  filters:
+                    - RewritePath=/grades/(?<path>.*), /$\{path}
+
+    data:
+        redis:
+            host: localhost
+            port: 6379
+            password: redis_password
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info,metrics
+
+resilience4j:
+    circuitbreaker:
+        instances:
+            authService:
+                slidingWindowType: COUNT_BASED
+                slidingWindowSize: 10
+                failureRateThreshold: 50
+                waitDurationInOpenState: 10000
+                permittedNumberOfCallsInHalfOpenState: 3
+            courseService:
+                slidingWindowType: COUNT_BASED
+                slidingWindowSize: 10
+                failureRateThreshold: 50
+                waitDurationInOpenState: 10000
+                permittedNumberOfCallsInHalfOpenState: 3
+            enrollmentService:
+                slidingWindowType: COUNT_BASED
+                slidingWindowSize: 10
+                failureRateThreshold: 50
+                waitDurationInOpenState: 10000
+                permittedNumberOfCallsInHalfOpenState: 3
+            gradingService:
+                slidingWindowType: COUNT_BASED
+                slidingWindowSize: 10
+                failureRateThreshold: 50
+                waitDurationInOpenState: 10000
+                permittedNumberOfCallsInHalfOpenState: 3
