@@ -20,11 +20,17 @@ spring:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
                 "[format_sql]": true
 
+    flyway:
+        enabled: true
+        baseline-on-migrate: true
+        locations: classpath:db/migration
+
     security:
         oauth2:
             resourceserver:
                 jwt:
                     issuer-uri: http://localhost:8081
+                    jwk-set-uri: http://localhost:8081/.well-known/jwks.json
 
     data:
         redis:
@@ -32,8 +38,40 @@ spring:
             port: 6379
             password: redis_password
 
+    cloud:
+        circuitbreaker:
+            resilience4j:
+                enabled: true
+                
+
 management:
     endpoints:
         web:
             exposure:
                 include: health,info,metrics
+
+app:
+    jwt:
+        secret: yourStrongSecretKeyHereMakeSureItIsAtLeast32BytesLong
+        expirationMs: 3600000  # 1 hour
+        issuer: http://localhost:8081
+        audience: auth-service-client
+
+resilience4j:
+    circuitbreaker:
+        instances:
+            oauthProviderCB:
+                registerHealthIndicator: true
+                slidingWindowSize: 10
+                minimumNumberOfCalls: 5
+                permittedNumberOfCallsInHalfOpenState: 3
+                waitDurationInOpenState: 30s
+                failureRateThreshold: 50
+    retry:
+        instances:
+            oauthProviderRetry:
+                maxAttempts: 3
+                waitDuration: 1s
+                retryExceptions:
+                    - org.springframework.web.client.ResourceAccessException
+                    - java.util.concurrent.TimeoutException
