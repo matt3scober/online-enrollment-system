@@ -13,7 +13,7 @@ spring:
     
     jpa:
         hibernate:
-            ddl-auto: validate
+            ddl-auto: update
         show-sql: true
         properties:
             hibernate:
@@ -32,8 +32,40 @@ spring:
             port: 6379
             password: redis_password
 
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: http://localhost:8081
+                    jwk-set-uri: http://localhost:8081/.well-known/jwks.json
+
+logging:
+    level:
+        "[org.springframework.security]": DEBUG
+        "[org.springframework.security.oauth2]": DEBUG
+
 management:
     endpoints:
         web:
             exposure:
                 include: health,info,metrics
+
+resilience4j:
+    circuitbreaker:
+        instances:
+            gradeService:
+                registerHealthIndicator: true
+                slidingWindowSize: 10
+                minimumNumberOfCalls: 5
+                permittedNumberOfCallsInHalfOpenState: 3
+                automaticTransitionFromOpenToHalfOpenEnabled: true
+                waitDurationInOpenState: 5s
+                failureRateThreshold: 50
+                eventConsumerBufferSize: 10
+    retry:
+        instances:
+            gradeService:
+                maxAttempts: 3
+                waitDuration: 1s
+                enableExponentialBackoff: true
+                exponentialBackoffMultiplier: 2
