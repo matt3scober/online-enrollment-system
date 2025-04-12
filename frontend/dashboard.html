@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Student Dashboard</title>
+    <script src="js/token.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js" defer></script>
+</head>
+
+<body>
+    <h1>Course Catalog</h1>
+    <div id="courseList"></div>
+
+    <h2>Enroll in Course</h2>
+    <form id="enrollForm">
+        <label for="courseId">Course ID:</label>
+        <input type="text" id="courseId" required>
+        <button type="submit">Enroll</button>
+    </form>
+
+    <button id="logoutBtn">Logout</button>
+</body>
+
+</html>

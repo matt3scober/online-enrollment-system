@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Grades Management</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <!-- Include token and API helper scripts -->
+    <script src="js/token.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/grades.js" defer></script>
+</head>
+
+<body>
+    <h1>Grades Management</h1>
+
+    <!-- For Students: Grade History Section -->
+    <section id="gradeHistory">
+        <h2>My Grade History</h2>
+        <table id="gradesTable">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Grade</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <!-- For Faculty: Grade Entry Form -->
+    <section id="gradeEntry">
+        <h2>Enter Grade (Faculty Only)</h2>
+        <form id="gradeForm">
+            <div>
+                <label for="courseId">Course ID:</label>
+                <input type="text" id="courseId" required>
+            </div>
+            <div>
+                <label for="studentId">Student ID:</label>
+                <input type="text" id="studentId" required>
+            </div>
+            <div>
+                <label for="grade">Grade:</label>
+                <input type="text" id="grade" required>
+            </div>
+            <button type="submit">Submit Grade</button>
+        </form>
+    </section>
+
+    <button id="logoutBtn">Logout</button>
+</body>
+
+</html>
