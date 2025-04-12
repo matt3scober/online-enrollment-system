@@ -25,7 +25,13 @@ public class JwtTokenService {
     public JwtTokenService(JwtProperties jwtProperties, RedisTemplate<String, Object> redisTemplate) {
         this.jwtProperties = jwtProperties;
         this.redisTemplate = redisTemplate;
-        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        
+        // Use Keys.secretKeyFor to generate a secure key for HS512
+        this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        
+        // Alternative approach if you want to keep using your configured secret,
+        // but make sure it's long enough (64+ characters for HS512)
+        // this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
     public String generateToken(Authentication authentication) {
@@ -45,7 +51,7 @@ public class JwtTokenService {
                 .setExpiration(expiryDate)
                 .setIssuer(jwtProperties.getIssuer())
                 .setAudience(jwtProperties.getAudience())
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(key) // No need to specify algorithm, it's inferred from the key
                 .compact();
         
         // Store token in Redis with expiration
@@ -55,6 +61,7 @@ public class JwtTokenService {
         return token;
     }
     
+    // Rest of your methods remain the same
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)

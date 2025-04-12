@@ -48,7 +48,13 @@ management:
     endpoints:
         web:
             exposure:
-                include: health,info,metrics
+                include: health,info,metrics,mappings
+
+logging:
+    level:
+        "[org.springframework.security]": DEBUG
+        "[org.springframework.security.authentication]": TRACE
+        "[com.p4.stdiscm.auth_service]": DEBUG
 
 app:
     jwt:
